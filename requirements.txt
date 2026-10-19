@@ -1,0 +1,7 @@
+# tau2-bench itself is installed from the pinned clone in sources/tau2-bench
+# (see README); it already pulls in fastapi, uvicorn and requests.
+fastapi
+uvicorn
+requests
+# Imported by tau2's package init but only listed in its optional "voice" extra.
+websockets

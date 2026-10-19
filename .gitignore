@@ -1,0 +1,22 @@
+# Local environments and third-party sources (see README for how to recreate)
+.venv/
+sources/
+__pycache__/
+.DS_Store
+
+# Secrets
+.env
+
+# Runtime files written while the tool server and tunnel are running
+tau2_retail/logs/
+tau2_retail/.tunnel_url
+
+# IDs of resources created in your own Oumi project, and the runs started there
+tau2_retail/platform_ids.json
+tau2_retail/runs.json
+
+# Archived: an earlier, never-run experiment with LLM-simulated tools
+grandstay/
+
+# Raw platform API responses; conversations.jsonl holds what's needed
+tau2_retail/results/*/oumi_dataitems.json
