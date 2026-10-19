@@ -1,6 +1,6 @@
 # τ²-bench retail on Oumi: a multi-turn tool-calling evaluation
 
-This repo runs the retail domain of [τ²-bench](https://github.com/sierra-research/tau2-bench) as a multi-turn tool-calling evaluation on the Oumi platform. It's the first step toward training a small, self-hosted tool-calling model: evaluate models on a realistic, checkable task now, then use the same setup to generate training data and fine-tune (SFT, later GRPO).
+This repo runs the retail domain of [τ²-bench](https://github.com/sierra-research/tau2-bench) as a multi-turn tool-calling evaluation on the Oumi platform. It's the first step toward training a small, self-hosted tool-calling model. 
 
 Oumi supplies the agent machinery: tool implementations, a simulated customer, and LLM judges. τ²-bench supplies a real store database, real tool code, a written policy, and tasks with known correct outcomes. No tool output is simulated: every tool call runs τ²'s retail code, so results can be checked exactly.
 
@@ -17,17 +17,13 @@ Oumi evaluation
                                                 │  public HTTPS
                                                 ▼
         Cloudflare tunnel ──► tool_server.py on your machine
-                                                │  one fresh store per session id
+                                                │  one fresh store per run + session
                                                 ▼
                          τ² retail tools + database (500 users, 1,000 orders)
 ```
 
-- **Run and session isolation.** Every evaluation run calls its own URL, `/runs/<run-tag>/tools/<tool>`, and the platform sends a session ID with every call. The server keeps a separate copy of the store for each run and session, so a cancellation shows up in that conversation's later lookups and nowhere else.
+- **Run and session isolation.** `run_evaluation.py` gives each run its own URL, `/runs/<run tag>/tools/<tool>`, by creating 16 implementations for it, and the platform sends a session ID with every call. The server keeps a separate copy of the store for each run and session, so a cancellation only shows up in that conversation, and two runs never share stores. [LOU-4417](https://linear.app/oumi/issue/LOU-4417) proposes a platform run ID that would remove the need for per-run implementations.
 - **Refusals reach the model.** A 2xx response body is the tool's output. When the store refuses a call, for example cancelling a delivered order, the server answers `400 {"error": "..."}`. The model sees that as the tool's error and has to recover.
-
-### Run isolation
-
-Each evaluation run gets its own URL path, `/runs/<run tag>/tools/<tool>`, and its own 16 implementations, created by `run_evaluation.py`. Runs never share stores, even when two run at the same time. The platform's session ID repeats across evaluations of the same dataset; [LOU-4417](https://linear.app/oumi/issue/LOU-4417) proposes a run ID header that would make per-run implementations unnecessary.
 
 ## Repo layout
 
@@ -36,7 +32,7 @@ Each evaluation run gets its own URL path, `/runs/<run tag>/tools/<tool>`, and i
 | `.env.example` | Environment variables to copy into `.env` |
 | `requirements.txt` | Python packages needed on top of τ²-bench |
 | `tau2_retail/convert_tasks.py` | Turns τ² retail tasks into Oumi rows: policy as the system prompt, a generic opening message, the 16 tool definitions, and metadata (`user_persona`, `expected_actions`, `required_statements`, `tau2_task_id`) |
-| `tau2_retail/tool_server.py` | FastAPI server exposing each τ² retail tool at `POST /tools/<name>`, one store per session |
+| `tau2_retail/tool_server.py` | FastAPI server exposing each τ² retail tool at `POST /runs/<run tag>/tools/<name>`, one store per run and session |
 | `tau2_retail/test_tool_server.py` | Local check: replays every task's correct actions through the server and compares the store with τ²'s; also checks auth, refusals and session isolation |
 | `tau2_retail/setup_platform.py` | Creates the dataset, 16 tools, 16 endpoint implementations and 2 judges in your Oumi project; writes `platform_ids.json` |
 | `tau2_retail/platform_ids.json` | IDs of what `setup_platform.py` created in your project; `run_evaluation.py` reads it. Git-ignored, since each person's project differs |
