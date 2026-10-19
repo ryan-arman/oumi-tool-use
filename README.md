@@ -1,4 +1,4 @@
-# τ²-bench retail on Oumi: a multi-turn tool-calling evaluation
+# Multi-turn tool-calling evaluation on Oumi
 
 This repo runs the retail domain of [τ²-bench](https://github.com/sierra-research/tau2-bench) as a multi-turn tool-calling evaluation on the Oumi platform. It's the first step toward training a small, self-hosted tool-calling model. 
 
