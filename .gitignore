@@ -19,4 +19,4 @@ tau2_retail/runs.json
 grandstay/
 
 # Raw platform API responses; conversations.jsonl holds what's needed
-tau2_retail/results/*/oumi_dataitems.json
+tau2_retail/results/**/oumi_dataitems.json

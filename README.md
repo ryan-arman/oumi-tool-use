@@ -132,7 +132,7 @@ The judges and the exact check can disagree for three reasons:
 | Model | Exact store match | Correct changes | Required statements | Notes |
 |---|---|---|---|---|
 | claude-sonnet-5.5 | 39/40 (97.5%) | 37/40 | 40/40 | [summary](tau2_retail/results/claude-sonnet-5.5/summary.md) |
-| google/gemma-4-E2B-it | ~~4/40~~ | ~~2/40~~ | ~~35/40~~ | **Invalid run**: shared the Sonnet run's stores; rerun pending ([summary](tau2_retail/results/gemma-4-E2B-it/summary.md)) |
+| google/gemma-4-E2B-it | 16/40 (40%) | 15/40 | 37/40 | [summary](tau2_retail/results/gemma-4-E2B-it/summary.md); mostly fails by transferring to a human instead of acting. An earlier run was invalid and is kept in `invalid-run-3597/` |
 
 Settings: the simulated customer is gpt-4.1 at temperature 0 (τ²-bench's default), the model under test runs at temperature 0, conversations allow at most 20 customer turns, and the judges are claude-sonnet-5.5 at temperature 0. These are single runs, not directly comparable to the τ² leaderboard; see the summary.
 
